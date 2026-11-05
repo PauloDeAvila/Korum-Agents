@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import { parseObject, validatePlan, validateTurn,validateReview,gate,testCommand,redact } from '../src/protocol.mjs';
+import { TEAM } from '../src/core.mjs';
+test('JSON estrito rejeita texto sem objeto',()=>{assert.deepEqual(parseObject('{"a":1}'),{a:1});assert.throws(()=>parseObject('texto'))});
+test('planejamento restringe equipe e remove repetidos',()=>{const p=validatePlan({summary:'ok',participants:['tyson','tyson','fake','nora']},TEAM.agents);assert.deepEqual(p.participants,['tyson','nora'])});
+test('requisições só aceitam agentes existentes',()=>{const t=validateTurn({message:'oi',status:'needs_help',requests:[{to:'nora',question:'testa?'},{to:'admin',question:'hack'}]},new Set(TEAM.agents.map(a=>a.id)));assert.equal(t.requests.length,1)});
+test('gate exige teste e dois revisores',()=>{const review={status:'approved',summary:'ok'};assert.equal(gate({test:{code:0,timeout:false},quality:review,governance:review,write:true}).approved,true);assert.equal(gate({test:null,quality:review,governance:review,write:true}).approved,false);assert.equal(gate({test:{code:0,timeout:false},quality:review,governance:review,write:false}).approved,false)});
+test('testes usam lista permitida',()=>{assert.deepEqual(testCommand('npm test'),['npm',['test']]);assert.equal(testCommand('rm -rf .'),null)});
+test('segredos comuns são mascarados',()=>assert.equal(redact('gsk_1234567890123456789'),'[REDACTED]'));
+test('revisões inválidas não são aprovadas',()=>assert.throws(()=>validateReview({status:'approved'})));

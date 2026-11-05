@@ -1,0 +1,31 @@
+name: Korum Codex AI-to-AI verification
+
+on:
+  push:
+    branches: [ "feat/korum-codex-ai-to-ai" ]
+    paths:
+      - "korum-runtime/**"
+      - ".github/workflows/korum-codex-runtime.yml"
+      - "KORUM.md"
+  pull_request:
+    branches: [ "feat/korum-command-center", "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  agent-network:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: korum-runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify Codex-only engine syntax
+        run: npm run check
+      - name: Test independent threads, peer messages, master feedback and quality gates
+        run: npm test

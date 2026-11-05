@@ -1,0 +1,16 @@
+{
+  "name": "@korum/codex-agent-network",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check cli.mjs && node --check src/contract.mjs && node --check src/store.mjs && node --check src/codex.mjs && node --check src/network.mjs"
+  },
+  "dependencies": {
+    "@openai/codex-sdk": "latest"
+  }
+}

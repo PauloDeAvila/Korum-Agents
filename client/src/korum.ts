@@ -106,7 +106,7 @@ function renderOverview() {
   const agentsBox = byId('live-agents');
   agentsBox.replaceChildren();
   if (!agents.length) {
-    renderEmpty(agentsBox, 'Nenhuma sessão observada', 'Os oito papéis da equipe foram configurados, mas a integração de sessões OpenCode ao escritório está em desenvolvimento.');
+    renderEmpty(agentsBox, 'Nenhuma sessão observada', 'Os oito papéis da equipe foram configurados, mas a integração de sessões Codex ao escritório está em desenvolvimento.');
   } else {
     for (const agent of agents.slice(0, 8)) agentsBox.append(makeAgentRow(agent));
   }
@@ -133,7 +133,7 @@ function renderTeams() {
     target.append(card);
   }
   const note = byId('teams-note');
-  note.textContent = 'As identidades são definidas em ai-office/agents/*.md. A conexão aparecerá quando a fonte OpenCode for integrada ao servidor do escritório.';
+  note.textContent = 'As identidades são definidas em ai-office/agents/*.md. A conexão aparecerá quando a fonte Codex for integrada ao servidor do escritório.';
 }
 
 function renderActivity() {
@@ -165,15 +165,15 @@ function renderGovernance() {
   reviews.replaceChildren();
   for (const [title, description, state] of [
     ['CI / integração contínua', 'O GitHub Actions deve validar a branch antes de qualquer merge.', 'Planejado'],
-    ['Revisão independente', 'Nora e Vera avaliam evidências e riscos de cada mudança.', 'MVP no AI Office'],
-    ['Memória persistente', 'Cada agente possui perfil próprio e memória episódica local.', 'MVP no AI Office'],
+    ['Revisão independente', 'Nora e Vera avaliam evidências e riscos de cada mudança.', 'MVP no runtime'],
+    ['Memória persistente', 'Cada agente possui perfil próprio e memória episódica local.', 'MVP no runtime'],
     ['PIE / contexto verificável', 'Conexão MCP e freshness do índice ainda não foram validadas.', 'Pendente'],
-    ['Integração visual OpenCode', 'Representar os agentes reais e suas reuniões nesta interface.', 'Pendente'],
+    ['Integração visual Codex', 'Representar os agentes reais e suas reuniões nesta interface.', 'Pendente'],
   ] as const) {
     const row = element('div', 'governance-row');
     const content = element('div');
     content.append(element('strong', '', title), element('p', '', description));
-    row.append(content, chip(state, state === 'MVP no AI Office' ? 'good' : 'quiet'));
+    row.append(content, chip(state, state === 'MVP no runtime' ? 'good' : 'quiet'));
     reviews.append(row);
   }
 }

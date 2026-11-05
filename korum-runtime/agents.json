@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "master": "master",
+  "agents": [
+    {
+      "id": "master",
+      "name": "Agent Master (Atlas)",
+      "team": "Coordenação",
+      "role": "Decompor tarefas, avaliar entregas, registrar critérios e decidir próximos passos",
+      "canEdit": false
+    },
+    {
+      "id": "tyson",
+      "name": "Tyson",
+      "team": "Engenharia",
+      "role": "Implementação e correção com testes",
+      "canEdit": true
+    },
+    {
+      "id": "iris",
+      "name": "Iris",
+      "team": "Arquitetura",
+      "role": "Arquitetura, dependências, contratos e refatoração",
+      "canEdit": false
+    },
+    {
+      "id": "nora",
+      "name": "Nora",
+      "team": "QA",
+      "role": "Teste, revisão independente e detecção de regressões",
+      "canEdit": false
+    },
+    {
+      "id": "vera",
+      "name": "Vera",
+      "team": "Governança",
+      "role": "Políticas, risco operacional, segurança e aprovação humana",
+      "canEdit": false
+    },
+    {
+      "id": "igor",
+      "name": "Igor",
+      "team": "Infra",
+      "role": "CI/CD, observabilidade e desempenho",
+      "canEdit": false
+    },
+    {
+      "id": "davi",
+      "name": "Davi",
+      "team": "Manutenção",
+      "role": "Diagnóstico, incidentes e débito técnico",
+      "canEdit": false
+    },
+    {
+      "id": "bia",
+      "name": "Bia",
+      "team": "Suporte",
+      "role": "Documentação, diagnóstico de usuário e apoio",
+      "canEdit": false
+    }
+  ]
+}

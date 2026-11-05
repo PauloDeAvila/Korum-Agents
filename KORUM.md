@@ -1,24 +1,23 @@
-# Korum-Agents — evolução do fork do Habblaud
+# Korum Agents — decisão Codex AI-to-AI
 
-Fork independente de `marmottajr/habblaud` para experimentar um **escritório de agentes colaborativos operado por OpenCode**.
+## Objetivo
 
-### Primeiro incremento
+Rede de agentes Codex com contextos independentes e colaboração persistente: perguntas diretas entre agentes, entrega ao Agent Master, reavaliação e realocação até concluir com evidências.
 
-Consulte [ai-office/README.md](ai-office/README.md).
+## Componentes ativos
 
-O módulo `ai-office/` adiciona:
-- oito identidades e papéis especializados;
-- coordenador, reuniões e pedidos de ajuda entre agentes;
-- sessões separadas de OpenCode, memória episódica por agente;
-- logs JSONL e relatórios de andamento;
-- gate de testes, QA e governança;
-- painel web experimental no localhost;
-- testes automatizados e workflow de CI.
+- korum-runtime/: AgentNetwork e SDK oficial Codex.
+- client/src/korum.ts: Command Center e monitor legado de sessões Codex.
+- korum-runtime/monitor.mjs: visualizador experimental de conversas.
+- server/sources/codex/: observador de sessões Codex existentes.
+- docs/KORUM-ROADMAP.md: plano de integração visual e PIE.
 
-Esta branch **não altera o Habblaud original**, nem a integração pixel art existente. O motor colaborativo é um módulo independente até que se conclua sua adaptação ao protocolo `AgentSource`.
+## Política
 
-### Fluxo de entrega
-
-Desenvolvimento em branches de feature; testes automáticos; PR para revisão; integração à `main` somente após verificação humana dos critérios de aceitação. Nenhuma alteração automática no upstream.
-
-A licença MIT e os direitos autorais originais permanecem preservados.
+1. Agentes possuem threads separadas; mensagens com origem, destino, correlação e histórico.
+2. Master avalia e pode devolver trabalho, mas não ignora testes.
+3. Escrita exige branch não principal e worktree limpa. Só engenharia recebe permissão de editar.
+4. Nenhum agente obtém permissão automática de push, merge, deploy ou de acessar segredos.
+5. Testes determinísticos precedem testes com modelos reais.
+6. Conclusão de implementação depende de diff Git + testes + QA + governança.
+7. Recuperação de fila, controle de custos e contexto PIE ainda são etapas futuras.

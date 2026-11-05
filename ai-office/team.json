@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "coordinator": "atlas",
+  "agents": [
+    {"id":"atlas", "name":"Atlas", "team":"Diretoria técnica", "role":"Coordenador", "capability":"read"},
+    {"id":"iris", "name":"Iris", "team":"Arquitetura", "role":"Arquiteta de software", "capability":"read"},
+    {"id":"tyson", "name":"Tyson", "team":"Engenharia", "role":"Desenvolvedor", "capability":"write"},
+    {"id":"nora", "name":"Nora", "team":"Qualidade", "role":"QA e revisão independente", "capability":"read"},
+    {"id":"vera", "name":"Vera", "team":"Governança", "role":"Governança, segurança e conformidade", "capability":"read"},
+    {"id":"igor", "name":"Igor", "team":"Infraestrutura", "role":"SRE e CI/CD", "capability":"read"},
+    {"id":"davi", "name":"Davi", "team":"Manutenção", "role":"Manutenção e diagnóstico", "capability":"read"},
+    {"id":"bia", "name":"Bia", "team":"Suporte", "role":"Suporte técnico e documentação", "capability":"read"}
+  ]
+}

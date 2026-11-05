@@ -1,0 +1,13 @@
+{
+  "name": "habblaud-ai-office-opencode",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node cli.mjs",
+    "bridge": "node bridge.mjs",
+    "test": "node --test test/*.test.mjs",
+    "check": "node --check cli.mjs && node --check src/core.mjs && node --check src/opencode-runner.mjs && node --check src/store.mjs && node --check src/protocol.mjs && node --check bridge.mjs"
+  }
+}

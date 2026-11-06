@@ -1,36 +1,97 @@
-# Korum Agents
+# Korum Agents Mini
 
-**Agentes Codex que conversam, trabalham e recebem feedback do Agent Master.**
+Korum é um escritório **local e compacto**, com monitoramento do Codex, detecção do OpenCode e delegação segura de tarefas. Também dispõe de um gateway MCP para clientes de IA compatíveis, incluindo agentes especializados que desejem solicitar análises a um OpenCode local.
 
-O Korum evolui a partir de uma base visual do [Habblaud](https://github.com/marmottajr/habblaud) para uma camada própria de orquestração Codex-only, marca e interface independente. O fork ainda pertence à rede do upstream; componentes derivados mantêm licença MIT e créditos pertinentes.
+A base visual foi derivada do [Habblaud](https://github.com/marmottajr/habblaud). Consulte [LICENSE](LICENSE) e mantenha os créditos da licença MIT. O repositório continua tecnicamente um fork até a operação manual de desvinculação.
 
-## Componentes
+## Acesso sem login
 
-- **Codex Agent Network:** pasta korum-runtime/ — Master, especialistas, troca AI-to-AI, threads persistentes e ciclos de revisão.
-- **Korum Command Center:** novo dashboard com projetos, sessões e atividades detectadas pelo backend legado.
-- **Conversas AI-to-AI:** visualizador local em http://127.0.0.1:4860, quando o monitor é iniciado.
-- **Escritório pixel art:** disponível em /legacy.html durante a migração.
+O **escritório local** não solicita cadastro, e-mail ou senha. O Habblaud World (cidade online de terceiros) fica **desligado por padrão** neste Korum; os recursos de conta e login do serviço externo não são usados nem contornados. A interface original de escritório fica em /legacy.html, sem a seção World online.
 
-## Executar um experimento
+A autenticação remota continua protegida, quando ativada explicitamente. O gateway /api/korum/* só atende ao loopback do próprio computador e respeita a proteção de Origin/Host da API.
 
-Valide o Codex autenticado em seu computador e utilize Node.js 22+, Git e npm:
+## Iniciar no Windows
+
+Pré-requisitos: Node.js 22.12+, Git e Codex configurado. OpenCode é opcional.
+
+No PowerShell, dentro da pasta Korum:
+
+    npm ci
+    $env:KORUM_WORKSPACE = (Resolve-Path "C:\CAMINHO\DO\MEU-PROJETO").Path
+    npm run build
+    npm start
+
+Abra http://127.0.0.1:4747/ e escolha **Delegações**. O painel exibirá se o OpenCode foi detectado.
+
+Em outro PowerShell:
+
+    cd "C:\CAMINHO\DO\MEU-PROJETO"
+    opencode serve --hostname 127.0.0.1 --port 4096
+
+O OpenCode precisa estar no **mesmo projeto** de KORUM_WORKSPACE para receber tarefas, e deve estar autenticado no próprio provedor de modelo conforme sua configuração existente. Não há login adicional do prédio Korum.
+
+Para usar outra porta local:
+
+    $env:KORUM_OPENCODE_URL = "http://127.0.0.1:4097"
+
+O servidor Korum lê essa variável ao iniciar. Não aceita endpoints remotos, caminhos arbitrários ou URLs com credenciais. Se seu OpenCode serve exige autenticação HTTP Basic, configure as variáveis de ambiente KORUM_OPENCODE_USERNAME e KORUM_OPENCODE_PASSWORD no processo local Korum. Nunca salve senhas no repositório.
+
+## O que o Korum faz
+
+- **Codex:** monitora sessões abertas e mantém o núcleo AI-to-AI de Agent Master e especialistas em korum-runtime/.
+- **OpenCode:** verifica /global/health e o diretório /path; cria sessões próprias para tarefas de análise por /session e /session/{id}/message.
+- **Uma interface:** Dashboard local principal em :4747, com projetos, agentes, delegações, histórico e escritório.
+- **MCP local:** stdio, com ferramentas de descoberta e delegação (instruções abaixo).
+- **Persistência:** tarefas locais em dataDir/korum-gateway/tasks.json, sem upload ao GitHub.
+
+Nesta etapa, **delegações OpenCode são somente leitura**, mesmo quando o pedido menciona edição. O gateway usa o agente plan e desabilita ferramentas de shell/edição conhecidas. Isso é defesa em profundidade, mas não substitui isolamento de sistema operacional ou revisão de plugins de terceiros. Não há execução automática de merge, push ou deploy.
+
+## Configuração MCP
+
+O gateway usa **MCP em stdio**, não um servidor aberto na internet.
+
+Ferramentas disponibilizadas:
+
+| Nome | Ação |
+| --- | --- |
+| korum_list_agents | Lista agentes Codex/Korum e o executor OpenCode |
+| korum_list_providers | Verifica a conexão do OpenCode |
+| korum_delegate_opencode | Cria tarefa OpenCode de análise sem edição |
+| korum_get_task | Busca resultado/erro por taskId |
+| korum_list_tasks | Lista tarefas recentes e seus estados |
+
+Teste inicial no computador:
 
     cd korum-runtime
-    npm install
+    node mcp.mjs
+
+O processo fala JSON-RPC pelo stdin/stdout, portanto não há interface interativa nem mensagens de log em stdout. Ele deve ser iniciado por um **cliente MCP** configurado para executar Node.
+
+Exemplo de registro no Codex (ajuste o caminho absoluto em config.toml):
+
+    [mcp_servers.korum]
+    command = "node"
+    args = ["C:\\caminho\\Korum-Agents\\korum-runtime\\mcp.mjs"]
+
+Depois de configurar o cliente MCP e iniciar o Korum local, um agente Codex poderá pedir ao OpenCode uma análise por korum_delegate_opencode e consultar o resultado por korum_get_task.
+
+**ChatGPT e modelos mini:** MCP fornece o contrato técnico para um agente com cliente MCP chamar o Korum. Uma conversa ChatGPT comum não consegue acessar automaticamente o seu localhost. Será necessário conectar um cliente/ambiente compatível ou instalar uma integração personalizada autorizada. Não configuramos uma conexão de conta ChatGPT no GitHub, não expomos uma porta pública e não usamos a API do ChatGPT de maneira implícita.
+
+## Testes e desenvolvimento
+
+    npm run typecheck
+    npm test
+    npm run build
+    cd korum-runtime
     npm run check
     npm test
-    node cli.mjs --workspace "C:\dev\meu-projeto" --goal "Avalie o projeto e peça ajuda aos especialistas"
 
-O padrão é somente leitura. Para implementar: --write --test "npm test" somente em worktree limpa e de feature. Consulte [documentação do runtime](korum-runtime/README.md).
+Os testes de gateway são simulados (sem OpenCode autenticado); devem ser complementados por um teste de ponta a ponta no Windows. O Codex AI-to-AI atual também depende dessa validação real. PR em branch isolada, sem merge automático.
 
-## Estado
+## Status de maturidade
 
-- Implementado: protocolo P2P, delegação e revisão, memória episódica, adaptador Codex SDK, gates locais e monitor.
-- Testado: fluxo determinístico com driver Codex simulado e Git, via testes automatizados.
-- Pendente: integração end-to-end com Codex real no Windows, vínculo ao Codex Desktop já aberto, visualização nativa na UI principal, retomada da fila após crash, PIE/MCP e concorrência com isolamento.
+- Implementado: monitor Codex herdado, UI Korum Mini, gateway OpenCode local, API local de tarefas, MCP stdio, histórico local e núcleo Codex AI-to-AI.
+- Testado automaticamente: contratos locais, gates e roteamento simulado; o GitHub Actions registra o resultado.
+- Pendente: autenticação real com modelos OpenCode no PC, integração de threads OpenCode diretamente nos personagens pixel art, controle transacional de missões, segurança de plugins de terceiros, coordenação multiagente entre Codex e OpenCode e MCP remoto seguro.
 
-O monitor legado pode observar uma sessão Codex existente, mas a rede Korum cria threads próprias. Não assume automaticamente o controle da sua conversa atual.
-
-## Atribuição
-
-A base original do Habblaud continua sob licença MIT. Consulte [LICENSE](LICENSE) e preserve os avisos de direitos autorais. Para desvincular o fork formalmente, consulte [docs/KORUM-INDEPENDENCE.md](docs/KORUM-INDEPENDENCE.md).
+Acompanhe [KORUM.md](KORUM.md) e [roadmap](docs/KORUM-ROADMAP.md).

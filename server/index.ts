@@ -447,6 +447,8 @@ if (config.remote) {
       try {
         if (guard(req, res)) return;
         if (gate(req, res, url)) return;
+        // Não exponha estados, prompts ou delegações do Korum no acesso remoto.
+        if (url.pathname.startsWith('/api/korum/')) return void sendJson(res,403,{error:'A API Korum é exclusivamente local'});
         if (!api(req, res, url)) fallback(req, res, url);
       } catch (err) {
         log.warn(tr('Erro ao responder (remoto) {0} {1}: {2}', [req.method, url.pathname, errMsg(err)]));

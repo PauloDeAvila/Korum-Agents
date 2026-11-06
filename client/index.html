@@ -24,12 +24,12 @@
         <button class="nav-item" data-view="teams" type="button"><span class="nav-glyph">02</span>Equipes</button>
         <button class="nav-item" data-view="activity" type="button"><span class="nav-glyph">03</span>Atividade</button>
         <button class="nav-item" data-view="governance" type="button"><span class="nav-glyph">04</span>Governança</button>
-        <a class="nav-item" href="http://127.0.0.1:4860/" title="Acompanhar conversas locais entre agentes"><span class="nav-glyph">05</span>Conversas AI-to-AI</a><a class="nav-item" href="/legacy.html"><span class="nav-glyph">06</span>Escritório visual</a>
+        <button class="nav-item" data-view="delegations" type="button"><span class="nav-glyph">05</span>Delegações</button><a class="nav-item" href="/legacy.html"><span class="nav-glyph">06</span>Escritório visual</a>
       </div>
     </nav>
     <div class="rail-rule"></div>
-    <section class="rail-bottom"><p class="eyebrow">BUILD EXPERIMENTAL</p><strong>Korum Codex v0.2</strong>
-    <small>Equipes, memória persistente e colaboração. Codex será a fonte de execução.</small></section>
+    <section class="rail-bottom"><p class="eyebrow">BUILD EXPERIMENTAL</p><strong>Korum Mini v0.3</strong>
+    <small>Um único escritório local. Codex, OpenCode e delegações MCP.</small></section>
     <p class="rail-foot">© <span data-year></span> Korum Agents</p>
   </aside>
   <main class="workspace" id="main">
@@ -39,8 +39,8 @@
       <button type="button" id="refresh-button" class="icon-action" aria-label="Atualizar dados" title="Atualizar dados">↻</button></div>
     </header>
     <section class="hero" aria-label="Introdução">
-      <p class="eyebrow">MULTI-AGENT OPERATIONS PLATFORM</p><h1>Seu time. Um comando.</h1>
-      <p class="hero-copy">Coordene projetos, acompanhe especialistas e mantenha decisões, contexto e qualidade em um só lugar. Colaboração verificável entre agentes de IA.</p>
+      <p class="eyebrow">MULTI-AGENT OPERATIONS PLATFORM</p><h1>Seus agentes. Um painel.</h1>
+      <p class="hero-copy">Acompanhe Codex e OpenCode, delegue análises e consulte a atividade dos agentes. Tudo local, sem conta para acessar o escritório.</p>
       <p class="hero-note" id="last-updated">Conecte o servidor local</p>
     </section>
     <section data-panel="overview" aria-label="Visão geral">
@@ -64,23 +64,37 @@
       <label class="searchbox"><input id="activity-search" aria-label="Pesquisar atividades" type="search" placeholder="Buscar evento, projeto, agente"></label></div>
       <div class="card-body" id="activity-stream"></div></div>
     </section>
+    <section data-panel="delegations" hidden aria-label="Delegações OpenCode">
+      <h2 class="section-title">Delegações OpenCode</h2>
+      <p class="section-caption">Solicite uma análise a um agente OpenCode, sem modificar o projeto. A fila é local e também pode ser acessada via MCP.</p>
+      <div class="section-grid">
+        <section class="card">
+          <div class="card-head"><div><h2>Executor conectado</h2><p>Status do OpenCode no workspace</p></div><span class="chip chip--quiet" id="opencode-status">Detectando...</span></div>
+          <div class="card-body">
+            <p id="opencode-detail" class="section-caption">Consultando o servidor local...</p>
+            <p id="opencode-workspace" class="section-caption"></p>
+            <form id="delegation-form" class="delegation-form">
+              <label for="delegation-title">Título (opcional)</label>
+              <input id="delegation-title" type="text" maxlength="100" placeholder="Revisão de arquitetura">
+              <label for="delegation-instruction">O que deseja investigar?</label>
+              <textarea id="delegation-instruction" rows="5" minlength="8" maxlength="2200" required placeholder="Investigue as dependências deste módulo, identifique riscos e apresente referências..."></textarea>
+              <button id="delegate-button" type="submit" disabled>Delegar análise</button>
+              <p id="delegation-message" role="status" class="section-caption">Somente leitura. Nenhum arquivo será editado pelo gateway.</p>
+            </form>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-head"><div><h2>Fila de tarefas</h2><p>Resultados e histórico local</p></div><span class="chip chip--quiet">MCP + painel</span></div>
+          <div id="delegated-list" class="card-body"></div>
+        </section>
+      </div>
+    </section>
     <section data-panel="governance" hidden aria-label="Governança">
       <h2 class="section-title">Controle de qualidade e memória</h2><p class="section-caption">Critérios de aceite, segurança, memória individual e contexto verificável. Um modelo não aprova a própria implementação.</p>
       <div class="card"><div class="card-head"><div><h2>Controles operacionais</h2><p>Estado da arquitetura e das integrações</p></div><span class="chip chip--quiet">Roadmap</span></div><div class="card-body" id="governance-checks"></div></div>
     </section>
   </main>
-  <aside class="inspector" aria-label="Centro de acompanhamento">
-    <header class="inspector-head"><p class="eyebrow">MISSION CONTROL</p><h2 class="inspector-title">Ciclo de trabalho</h2>
-    <p class="inspector-sub">Da solicitação à manutenção. Cada decisão deixa rastros e evidências.</p></header>
-    <section class="inset-card"><p class="eyebrow">ORQUESTRAÇÃO</p><ol class="timeline">
-      <li>Diretor define o objetivo</li><li>Atlas reúne e distribui escopos</li><li>Especialistas colaboram</li>
-      <li>Engenharia implementa</li><li>QA e governança verificam</li><li>Relatório e melhoria contínua</li>
-    </ol></section>
-    <section class="inset-card"><p class="eyebrow">ÁREA EXPERIMENTAL</p><h3 style="font-size:15px;margin:9px 0">Escritório vivo</h3>
-    <p class="inspector-sub">O mundo pixel art permanece acessível durante a transição. O barramento AI-to-AI do Codex terá integração nativa depois.</p>
-    <a href="/legacy.html" class="inspector-action">Abrir escritório visual</a></section>
-    <p class="inspector-foot">Korum Command Center — primeiro incremento do redesign. Nenhum agente fictício é mostrado como sessão real.</p>
-  </aside>
+
 </div>
 <script type="module" src="/src/korum.ts"></script>
 </body></html>

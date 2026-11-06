@@ -1,7 +1,7 @@
 import type { AgentInfo, AgentStatus, FeedItem, OfficeSnapshot } from '../../shared/types';
 import './korum.css';
 
-type View = 'overview' | 'teams' | 'activity' | 'governance';
+type View = 'overview' | 'teams' | 'activity' | 'governance' | 'delegations';
 
 type Squad = {
   id: string;
@@ -38,6 +38,52 @@ const feedMap = new Map<string, FeedItem>();
 let currentView: View = 'overview';
 let snap: OfficeSnapshot | null = null;
 let search = '';
+
+type KorumTask = { id:string; title:string; status:string; instruction:string; result?:string; error?:string; createdAt:string };
+type OpenCodeProvider = { name:'opencode';connected:boolean;workspace:string|null;enabled:boolean;detail:string;version?:string };
+let localTasks: KorumTask[] = [];
+let opencodeProvider: OpenCodeProvider | null = null;
+let submitting = false;
+
+function renderDelegations() {
+  const status=byId('opencode-status');
+  status.textContent=opencodeProvider?.connected?'Conectado':'Desconectado';
+  status.className='chip '+(opencodeProvider?.connected?'chip--good':'chip--quiet');
+  byId('opencode-detail').textContent=opencodeProvider?.detail||'Verificando disponibilidade do servidor local';
+  byId('opencode-workspace').textContent=opencodeProvider?.workspace?'Projeto: '+opencodeProvider.workspace:'Configure KORUM_WORKSPACE no servidor Korum';
+  byId<HTMLButtonElement>('delegate-button').disabled=submitting||!(opencodeProvider?.connected&&opencodeProvider.enabled);
+  const target=byId('delegated-list');target.replaceChildren();
+  if(!localTasks.length){renderEmpty(target,'Nenhuma tarefa delegada','As análises enviadas pelo painel ou por ferramentas MCP aparecerão aqui.');return;}
+  for(const task of localTasks.slice(0,15)){
+    const entry=element('article','delegation-item');
+    const header=element('div','delegation-item__top');
+    header.append(element('strong','',task.title),chip(task.status,task.status==='completed'?'good':task.status==='failed'?'warn':'quiet'));
+    entry.append(header,element('small','',task.createdAt));
+    if(task.result)entry.append(element('p','delegation-result',task.result.slice(0,1700)));
+    else if(task.error)entry.append(element('p','delegation-error',task.error));
+    else entry.append(element('p','delegation-result',task.status==='running'?'OpenCode está trabalhando...':'Aguardando execução.'));
+    target.append(entry);
+  }
+}
+async function refreshDelegations(){
+  try{
+    const [providers,tasks]=await Promise.all([
+      fetch('/api/korum/providers',{cache:'no-store'}),
+      fetch('/api/korum/tasks',{cache:'no-store'})
+    ]);
+    if(!providers.ok||!tasks.ok)throw new Error('Gateway local não disponível');
+    const a=await providers.json() as {providers:OpenCodeProvider[]};
+    const b=await tasks.json() as {tasks:KorumTask[]};
+    opencodeProvider=a.providers.find(p=>p.name==='opencode')??null;
+    localTasks=Array.isArray(b.tasks)?b.tasks:[];
+    renderDelegations();
+  }catch{
+    opencodeProvider=null;
+    byId('opencode-detail').textContent='Gateway de delegação indisponível';
+    byId<HTMLButtonElement>('delegate-button').disabled=true;
+  }
+}
+
 
 function element<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, value?: string): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag);
@@ -204,6 +250,7 @@ function switchView(view: View) {
     teams: 'Equipes e responsabilidades',
     activity: 'Fluxo de atividade',
     governance: 'Governança e memória',
+    delegations: 'Delegações OpenCode',
   })[view];
 }
 
@@ -234,6 +281,32 @@ byId<HTMLInputElement>('activity-search').addEventListener('input', event => {
   renderActivity();
 });
 byId<HTMLButtonElement>('refresh-button').addEventListener('click', () => { void initialLoad(); });
+byId<HTMLFormElement>('delegation-form').addEventListener('submit', event=>{
+  event.preventDefault();
+  if(submitting||!(opencodeProvider?.connected&&opencodeProvider.enabled))return;
+  const instruction=byId<HTMLTextAreaElement>('delegation-instruction').value.trim();
+  const title=byId<HTMLInputElement>('delegation-title').value.trim();
+  if(instruction.length<8)return;
+  submitting=true;renderDelegations();
+  void (async()=>{
+    try{
+      const response=await fetch('/api/korum/tasks',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({instruction,title})
+      });
+      const result=await response.json() as {task?:KorumTask;error?:string};
+      if(!response.ok)throw new Error(result.error||'Falha no gateway');
+      byId('delegation-message').textContent='Tarefa enviada: '+(result.task?.id||'');
+      byId<HTMLTextAreaElement>('delegation-instruction').value='';
+      await refreshDelegations();
+    }catch(error){
+      byId('delegation-message').textContent=error instanceof Error?error.message:'Erro de delegação';
+    }finally{submitting=false;renderDelegations();}
+  })();
+});
+void refreshDelegations();
+setInterval(()=>{void refreshDelegations();},3500);
+
 document.querySelectorAll<HTMLElement>('[data-year]').forEach(e => { e.textContent = String(new Date().getFullYear()); });
 
 switchView(currentView);

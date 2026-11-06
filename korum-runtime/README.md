@@ -1,101 +1,59 @@
-# Korum Agents — Codex AI-to-AI
+# Korum Runtime — Codex AI-to-AI + Gateway MCP
 
-**Objetivo:** agentes Codex com sessões persistentes individuais, mensagens diretas roteadas pelo Korum, Agent Master delegando e revisando, loops de feedback até conclusão verificável.
+O runtime possui dois fluxos complementares:
 
-Esta branch substitui o orquestrador experimental anterior por um núcleo exclusivamente Codex. A interface do escritório herdado mantém seu leitor de sessões Codex; a nova rede de conversas tem monitor próprio nesta etapa.
+1. **Codex AgentNetwork:** Agent Master (Atlas) conversa com especialistas, solicita feedback e verifica testes.
+2. **OpenCode via gateway:** agentes externos e agentes Codex com suporte MCP podem solicitar análises ao OpenCode local, usando as mesmas tarefas que aparecem no Korum Mini em :4747.
 
-## Componentes
+## Fluxo Codex AI-to-AI
 
-- Agent Master (Atlas): abre missão, define critérios, delega, revisa e devolve tarefas.
-- Tyson: engenharia; único agente autorizável para edição.
-- Iris: arquitetura e apoio técnico.
-- Nora: QA e revisão independente.
-- Vera: segurança e governança.
-- Igor: infraestrutura, CI e confiabilidade.
-- Davi: manutenção e diagnóstico.
-- Bia: suporte e documentação.
+Os agentes Codex usam sessões próprias via @openai/codex-sdk. Em modo leitura:
 
-Cada agente é uma thread Codex independente, criada ou retomada pelo SDK oficial. As mensagens entre pares são realmente entregues à thread do destinatário pelo Korum, e a resposta volta ao solicitante com um identificador de correlação.
+    node cli.mjs --workspace "C:\dev\meu-projeto" --goal "Avalie a arquitetura"
 
-O fluxo suporta perguntas e respostas entre pares, devolutivas ao solicitante, entregas ao Master, pedidos de correção e redistribuição de tarefas.
+Escrita requer worktree limpa e não principal, opção --write e testes explícitos:
 
-## Preparar o Windows
+    node cli.mjs --workspace "C:\dev\worktree-experimental" --write --test "npm test" --goal "Corrija um bug"
 
-- Node.js 22+;
-- Git instalado;
-- Codex CLI ou aplicativo configurado e autenticado;
-- repositório local com branch Git válida.
+O Agent Master pode devolver tarefas para correção, e Nora/Vera revisam as evidências; aprovação do Master não dispensa testes.
 
-Na pasta do Korum:
+## OpenCode / MCP
 
-    cd korum-runtime
-    npm install
-    npm run check
-    npm test
+A interface principal da delegação está integrada ao servidor Korum: http://127.0.0.1:4747/.
 
-O motor usa a biblioteca oficial @openai/codex-sdk. A dependência está marcada como latest nesta prova experimental, sem lockfile. Para release, fixaremos a versão após uma validação end-to-end.
+Instale o projeto com npm ci na raiz. Configure no PowerShell:
 
-### Primeiro teste somente leitura
+    $env:KORUM_WORKSPACE = "C:\dev\meu-projeto"
+    npm start
 
-    node cli.mjs --workspace "C:\dev\meu-projeto" --goal "Investigue riscos e proponha correções, conversando entre especialistas"
+Abra outra janela no diretório do MESMO projeto:
 
-O Master pode aceitar uma análise, mas o estado final será reviewed, não implementação certificada. Nenhum agente edita código nesse modo.
+    opencode serve --hostname 127.0.0.1 --port 4096
 
-### Escrita opcional, somente em worktree experimental
+As tarefas são enfileiradas no próprio servidor Korum e executadas sequencialmente em **plan (somente leitura)**. Se o servidor OpenCode estiver em outro projeto, o Korum falhará sem executar a análise. Tasks interrompidas por reinício não são repetidas automaticamente.
 
-    node cli.mjs --workspace "C:\dev\meu-projeto-lab" --write --test "npm test" --goal "Corrija um bug e valide as alterações"
+MCP stdio:
 
-Escrita exige branch diferente de main/master, worktree limpa e comando permitido. Somente Tyson recebe workspace-write; os demais permanecem read-only. O sistema não executa push, merge ou deploy intencionalmente.
+    node mcp.mjs
 
-**Segurança:** o sandbox do Codex não substitui isolamento de SO. Para alterações de risco use VM/container isolado ou worktree descartável, e revisão humana antes de integrar.
+Use um cliente MCP configurado com Node e o caminho absoluto deste arquivo. O cliente precisa executar no seu computador ou ter acesso autorizado a ele; um ChatGPT hospedado remotamente não acessa o seu localhost por padrão.
 
-## Visualizar conversas AI-to-AI
+O processo MCP expõe ferramentas para listar agentes/provedores, delegar tarefa de leitura e consultar status. Ele não aceita diretório arbitrário e não fornece shell, edição ou deploy.
 
-O CLI imprime encaminhamentos e decisões do Master. Em outro terminal, use a pasta de estado exibida pela execução:
+## Logs e memória
 
-    node monitor.mjs --state "CAMINHO-DO-ESTADO" --port 4860
+- Missões Codex: ~/.korum-agents/<hash-do-projeto>/
+- Fila OpenCode: diretório de dados do aplicativo Korum, subpasta korum-gateway/tasks.json
 
-Abra http://127.0.0.1:4860.
+Não versione tokens, memórias de agentes ou logs de projetos privados.
 
-O monitor somente leitura escuta em loopback, exibindo threads, perguntas, respostas, decisões e resultados. Ainda é separado do Command Center e do escritório pixel art.
+## Segurança
 
-## Memória
+- Somente interface local e gateway protegido por loopback e Origin/Host;
+- World externo desligado por padrão, acesso remoto existente preservado;
+- Gateway OpenCode reconhece apenas URL HTTP de loopback e workspace configurado previamente;
+- MCP delegado: apenas análise sem edição (não há ferramenta de escrita);
+- OpenCode não tem sandbox garantido pelo Korum; execute em ambiente de testes para repositórios sensíveis;
+- Identidades e modelos ChatGPT mini não são automaticamente conectados: MCP é a porta de integração a um cliente compatível.
 
-Estado local em ~/.korum-agents/<hash-do-workspace>:
-
-    snapshot.json
-    events.jsonl
-    brains/master.md
-    brains/tyson.md
-    ...
-
-- Identidade: agents.json versionado.
-- Memória episódica: brains/*.md local.
-- Conversas e decisões: events.jsonl local.
-- Contexto da própria thread: sessões persistidas pelo Codex.
-- PIE/MCP verificável: integração nativa futura.
-
-O conteúdo das mensagens fica no computador. Não inclua credenciais em prompts: a máscara de tokens conhecidos não cobre todas as chaves.
-
-## Limites e critérios de conclusão
-
-- Até 24 turnos Codex por missão e 5 rodadas do Master por padrão.
-- Até 3 saltos de perguntas entre agentes e 12 mensagens peer-to-peer.
-- Se o Master não conseguir concluir dentro do orçamento: needs_review.
-- Implementação verified exige diff Git, comando de teste verde, QA Nora e governança Vera aprovados.
-- Aprovação verbal do Master não desativa os gates.
-- As threads individuais podem ser retomadas pelo SDK. A fila de uma missão interrompida ainda NÃO retoma automaticamente.
-
-## Validação e limitações
-
-Há testes unitários/simulados para perguntas de Tyson a Iris, reincorporação de respostas, devolutiva do Master, iterações, bloqueios, qualidade, branch e limites. Eles não autenticam nem executam modelos reais. É necessária prova end-to-end com Codex no Windows.
-
-A rede Korum cria threads próprias. Não adota automaticamente a sessão que já está aberta no Codex Desktop; o monitor herdado pode observá-la. Anexar mensagens à sessão existente exigirá integração explícita ao Codex app-server.
-
-## Próximos incrementos
-
-1. Conversas no Korum Command Center e personagens.
-2. Fila persistente transacional com recuperação após crash.
-3. Integração opcional à sessão Codex Desktop após autorização.
-4. PIE/MCP com proveniência, hash e freshness.
-5. Execução concorrente em worktrees, limite de custos e integração Git supervisionada.
+Leia também [README principal](../README.md).

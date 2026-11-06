@@ -59,7 +59,8 @@ import { BuildingTokens } from './world/tokens';
 import { BuildingUplink } from './world/uplink';
 import { WorldViewer } from './world/viewer';
 
-const config = loadConfig();
+// Korum Mini inicia sem o World externo; o parâmetro explícito HABBLAUD_WORLD=1 continua suportado.
+const config = loadConfig({...process.env, HABBLAUD_WORLD: process.env.HABBLAUD_WORLD ?? '0'});
 const startedAt = Date.now();
 
 // Nome antigo (CodeTown, até a 0.3.2): leva ~/.codetown para ~/.habblaud antes de ler qualquer estado e avisa
@@ -447,6 +448,8 @@ if (config.remote) {
       try {
         if (guard(req, res)) return;
         if (gate(req, res, url)) return;
+        // Não exponha estados, prompts ou delegações do Korum no acesso remoto.
+        if (url.pathname.startsWith('/api/korum/')) return void sendJson(res,403,{error:'A API Korum é exclusivamente local'});
         if (!api(req, res, url)) fallback(req, res, url);
       } catch (err) {
         log.warn(tr('Erro ao responder (remoto) {0} {1}: {2}', [req.method, url.pathname, errMsg(err)]));

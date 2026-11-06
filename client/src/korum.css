@@ -123,3 +123,23 @@ h1{font-weight:600;font-size:clamp(32px,3vw,49px);margin:9px 0 10px}
 @media(max-width:700px){.workspace-header{align-items:flex-start}.header-actions{justify-content:flex-end}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.section-grid,.squad-grid,.inspector{grid-template-columns:1fr}.inspector-head,.inspector-foot{grid-column:auto}.hero{padding-top:31px}.hero-copy{font-size:12px}.card-head{padding:16px}.card-body{padding:12px}.stat{padding:15px}.online-badge{max-width:155px;overflow:hidden;text-overflow:ellipsis}}
 @media(max-width:420px){.stat-top{font-size:10px}.chip{white-space:normal;text-align:center}.nav-glyph{display:none}.identity small{font-size:9px}.workspace{padding:15px 12px}.project-item,.agent-item{gap:8px}.agent-item .chip{font-size:9px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Korum Mini: painel único, sem World externo. */
+.korum-app{grid-template-columns:214px minmax(0,1fr);max-width:1500px}
+.rail{padding:20px 12px;gap:18px}
+.workspace{padding-top:18px}
+.hero{padding:28px 0 22px}
+.rail-bottom{padding:12px}
+.delegation-form{display:grid;gap:10px}
+.delegation-form label{font-size:12px;color:var(--muted)}
+.delegation-form input,.delegation-form textarea{background:#0c1726;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:10px;min-width:0;resize:vertical}
+.delegation-form button{padding:11px 16px;border:1px solid rgba(102,225,204,.35);border-radius:9px;background:rgba(102,225,204,.14);color:var(--teal);font-weight:700}
+.delegation-form button:disabled{opacity:.45;cursor:not-allowed}
+.delegation-item{display:grid;gap:8px;padding:14px 3px;border-bottom:1px solid var(--line)}
+.delegation-item:last-child{border:0}
+.delegation-item__top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.delegation-item strong{font-size:13px}
+.delegation-item small{color:var(--muted)}
+.delegation-result,.delegation-error{color:#b9cadb;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.delegation-error{color:#f3a7a7}
+@media(max-width:950px){.korum-app{grid-template-columns:1fr}}

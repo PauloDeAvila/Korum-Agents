@@ -1,39 +1,24 @@
-# Korum Agents — Roadmap Codex AI-to-AI
+# Korum Agents — Roadmap Mini / Codex / OpenCode / MCP
 
-## Etapa 0: monitor e UI
-- [x] Korum Command Center com projetos, sessões e atividades Codex detectadas.
-- [x] Interface visual herdada preservada em /legacy.html.
-- [ ] Validação end-to-end do monitor no Windows com Codex Desktop em múltiplas versões.
+## Pronto como base
+- [x] Korum Mini com painel e escritório local sem login online por padrão.
+- [x] Habblaud World online desligado por padrão, sem contornar login do serviço externo.
+- [x] Codex: monitor de sessões e Agent Master com colaboração entre agentes (testes simulados).
+- [x] OpenCode: health local, checagem de workspace, fila de análises e persistência de resultados.
+- [x] API local com proteção loopback/Origin e sem escrita para tarefas OpenCode.
+- [x] Ferramentas MCP stdio para descobrir provedores, delegar análises e consultar tarefas.
+- [x] Uma aba Delegações no Command Center principal, sem visualizador extra obrigatório.
+- [ ] CI geral validado, incluindo gateway, MCP e testes herdados.
 
-## Etapa 1: protocolo AI-to-AI
-- [x] Threads Codex individuais, com adaptador SDK e persistência de IDs.
-- [x] Mensagens peer-to-peer, replyTo e histórico de eventos local.
-- [x] Master delega, avalia, devolve tarefas e pode aceitar entregas.
-- [x] Limites de turnos, rodadas e profundidade de perguntas.
-- [x] Testes simulados de peer messaging, feedback e bloqueios de qualidade.
-- [x] Monitor local das conversas e decisões.
-- [ ] Prova end-to-end SDK/Codex real no Windows e Linux.
-- [ ] Benchmark de tokens, qualidade e latência com Codex real.
+## Próximas verificações
+- [ ] E2E com OpenCode real no Windows, autenticado e apontando ao workspace correto.
+- [ ] E2E com Codex SDK/Agent Master reais, inclusive uso do MCP no Codex.
+- [ ] Protocolo de estados e mensagens de agentes OpenCode no escritório pixel art.
+- [ ] Cliente MCP para ChatGPT com autorização explícita e compatibilidade verificada; sem localhost remoto automático.
+- [ ] Filas transacionais duráveis, idempotência, controle de custos e cancelamento.
+- [ ] Sandbox OS com permissões verificáveis (plan mode e bloqueio de ferramentas isoladamente não bastam).
+- [ ] Integração PIE com proveniência, hash, freshness e impacto de código.
+- [ ] Integração humana para merges e deploys, somente com autorização e CI verde.
 
-## Etapa 2: visualização integrada
-- [ ] Integrar missões, threads e mensagens ao servidor e ao Command Center.
-- [ ] Exibir trocas, revisões e encontros nos personagens pixel art.
-- [ ] Controles humanos de pausa, retomada, cancelamento e aprovação.
-- [ ] Vincular sessões Codex Desktop preexistentes somente com autorização explícita.
-
-## Etapa 3: orquestração robusta
-- [ ] Fila transacional com recuperação, idempotência e replay.
-- [ ] Concorrência segura com lock e worktrees Git por agente.
-- [ ] Revisão QA com rodadas corretivas supervisionadas.
-- [ ] Limite de tokens e custos, auditoria de chamadas.
-- [ ] PIE/MCP com freshness, proveniência e análise de impacto.
-
-## Etapa 4: operação e produto
-- [ ] Fluxo testes → revisão → main com CI obrigatório.
-- [ ] Relatórios de manutenção e decisões versionadas.
-- [ ] Testes E2E UI, acessibilidade e compatibilidade Windows.
-- [ ] Desvincular a rede de fork após preservar PRs e evidências.
-
-## Invariantes
-
-Nenhuma implementação é certificada somente pela opinião do Master. Mensagens são rastreáveis. Loops são limitados. Falha de testes ou de governança impede conclusão.
+## Política
+Sem exposição pública do gateway, sem credenciais em Git, sem tratar opiniões de agentes como teste, sem mudança automática na main. Manter os créditos MIT do upstream.

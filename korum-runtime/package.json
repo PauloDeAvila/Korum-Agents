@@ -1,5 +1,5 @@
 {
-  "name": "@korum/codex-agent-network",
+  "name": "@korum/agent-runtime",
   "version": "0.2.0",
   "private": true,
   "type": "module",
@@ -8,9 +8,11 @@
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check": "node --check cli.mjs && node --check src/contract.mjs && node --check src/store.mjs && node --check src/codex.mjs && node --check src/network.mjs"
+    "check": "node --check cli.mjs && node --check src/contract.mjs && node --check src/store.mjs && node --check src/codex.mjs && node --check src/network.mjs && node --check mcp.mjs",
+    "mcp": "node mcp.mjs"
   },
   "dependencies": {
     "@openai/codex-sdk": "latest"
-  }
+  },
+  "description": "Korum local Codex and OpenCode agent delegation gateway"
 }

@@ -59,7 +59,8 @@ import { BuildingTokens } from './world/tokens';
 import { BuildingUplink } from './world/uplink';
 import { WorldViewer } from './world/viewer';
 
-const config = loadConfig();
+// Korum Mini inicia sem o World externo; o parâmetro explícito HABBLAUD_WORLD=1 continua suportado.
+const config = loadConfig({...process.env, HABBLAUD_WORLD: process.env.HABBLAUD_WORLD ?? '0'});
 const startedAt = Date.now();
 
 // Nome antigo (CodeTown, até a 0.3.2): leva ~/.codetown para ~/.habblaud antes de ler qualquer estado e avisa

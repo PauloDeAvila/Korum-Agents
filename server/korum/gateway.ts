@@ -144,8 +144,9 @@ export class KorumGateway {
     const task: KorumTask={id:randomUUID(),provider:'opencode',title,instruction,
       createdAt:now(),updatedAt:now(),status:'queued'};
     this.tasks.push(task);this.save();
+    const accepted={...task}; // resposta 202 deve refletir o estado aceito, antes da fila avançar
     void this.work().catch(()=>undefined);
-    return {...task};
+    return accepted;
   }
   private async work(): Promise<void> {
     if(this.processing)return;

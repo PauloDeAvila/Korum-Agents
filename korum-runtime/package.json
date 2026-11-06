@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "check": "node --check cli.mjs && node --check src/contract.mjs && node --check src/store.mjs && node --check src/codex.mjs && node --check src/network.mjs",
+    "check": "node --check cli.mjs && node --check src/contract.mjs && node --check src/store.mjs && node --check src/codex.mjs && node --check src/network.mjs && node --check mcp.mjs",
     "mcp": "node mcp.mjs"
   },
   "dependencies": {

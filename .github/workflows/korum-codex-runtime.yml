@@ -2,13 +2,14 @@ name: Korum Codex AI-to-AI verification
 
 on:
   push:
-    branches: [ "feat/korum-codex-ai-to-ai" ]
+    branches: [ "feat/korum-codex-ai-to-ai", "feat/korum-local-mini-opencode-mcp" ]
     paths:
       - "korum-runtime/**"
+      - "server/korum/**"
       - ".github/workflows/korum-codex-runtime.yml"
       - "KORUM.md"
   pull_request:
-    branches: [ "feat/korum-command-center", "main" ]
+    branches: [ "feat/korum-command-center", "feat/korum-codex-ai-to-ai", "main" ]
   workflow_dispatch:
 
 permissions:

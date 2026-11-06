@@ -189,9 +189,7 @@ const LOCAL_WORLD_HOSTS: readonly string[] = ['127.0.0.1', 'host.docker.internal
  */
 export function parseWorldConfig(env: NodeJS.ProcessEnv, argv: string[]): WorldConfig {
   const flag = env.HABBLAUD_WORLD?.trim();
-  // Korum é um prédio LOCAL sem conta. O World externo só liga por opção explícita.
-  // Login externo NÃO é removido/burlado: o serviço simplesmente fica inativo por padrão.
-  const enabled = isTruthy(flag);
+  const enabled = !flag || isTruthy(flag);
   const dev = argv.includes('--dev') || isTruthy(env.HABBLAUD_WORLD_DEV);
   if (!enabled) return { enabled, dev };
   const raw = env.HABBLAUD_WORLD_URL?.trim();
